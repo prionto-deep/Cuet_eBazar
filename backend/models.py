@@ -46,6 +46,18 @@ class Seller(Base):
     hashed_password = Column(String(500), nullable=False)
     shop_name = Column(String(200), nullable=True)
     is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     products = relationship("Product", back_populates="seller")
+
+
+class Buyer(Base):
+    __tablename__ = "buyers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(200), nullable=False)
+    email = Column(String(200), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(500), nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

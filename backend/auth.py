@@ -13,6 +13,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme_buyer = OAuth2PasswordBearer(tokenUrl="/auth/buyer/login")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -43,7 +44,7 @@ def get_current_seller(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         seller_id: int = payload.get("sub")
-        if seller_id is None:
+        if seller_id is None or payload.get("role") != "seller":
             raise credentials_exception
     except JWTError:
         raise credentials_exception
@@ -52,3 +53,26 @@ def get_current_seller(
     if seller is None or not seller.is_active:
         raise credentials_exception
     return seller
+
+
+def get_current_buyer(
+    token: str = Depends(oauth2_scheme_buyer),
+    db: Session = Depends(get_db)
+) -> models.Buyer:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate buyer credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        buyer_id: int = payload.get("sub")
+        if buyer_id is None or payload.get("role") != "buyer":
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    buyer = db.query(models.Buyer).filter(models.Buyer.id == int(buyer_id)).first()
+    if buyer is None or not buyer.is_active:
+        raise credentials_exception
+    return buyer

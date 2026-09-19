@@ -84,6 +84,16 @@
   letter-spacing: 0.08em;
 }
 
+.product-shop-name {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .product-name {
   font-size: 0.9rem;
   font-weight: 600;

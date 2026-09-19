@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatBDT, formatUSD } from '../api/client'
+import { useCart } from '../context/CartContext'
 import './ProductCard.css'
 
 const API_BASE = 'http://localhost:8000'
@@ -17,11 +18,20 @@ function StarRating({ rating }) {
 }
 
 export default function ProductCard({ product }) {
+  const { addToCart, cartItems } = useCart()
+
   const imageUrl = product.image_url?.startsWith('http')
     ? product.image_url
     : `${API_BASE}${product.image_url}`
 
   const isInStock = product.stock > 0
+  const inCart = cartItems.some((i) => i.id === product.id)
+
+  const handleAddToCart = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (isInStock) addToCart(product)
+  }
 
   return (
     <Link
@@ -57,6 +67,10 @@ export default function ProductCard({ product }) {
         )}
         <h3 className="product-name">{product.name}</h3>
 
+        {product.seller_shop_name && (
+          <p className="product-shop-name">🏪 {product.seller_shop_name}</p>
+        )}
+
         <div className="product-rating-row">
           <StarRating rating={product.rating} />
           <span className="review-count">({product.review_count?.toLocaleString()})</span>
@@ -74,10 +88,12 @@ export default function ProductCard({ product }) {
         )}
 
         <button
-          className="btn btn-primary w-full add-to-cart-btn"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+          className={`btn w-full add-to-cart-btn ${inCart ? 'btn-success' : 'btn-primary'}`}
+          onClick={handleAddToCart}
+          disabled={!isInStock}
+          id={`add-to-cart-${product.id}`}
         >
-          🛒 Add to Cart
+          {inCart ? '✓ In Cart' : '🛒 Add to Cart'}
         </button>
       </div>
     </Link>
