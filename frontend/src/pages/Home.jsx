@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SearchBar from '../components/SearchBar'
 import CategoryNav from '../components/CategoryNav'
@@ -37,11 +37,16 @@ function useProducts() {
 }
 
 const HERO_CATEGORIES = [
-  { icon: '📱', name: 'Smartphones', slug: 'smartphones', desc: '50+ models' },
-  { icon: '💻', name: 'Laptops', slug: 'laptops', desc: '40+ models' },
-  { icon: '🎧', name: 'Headphones', slug: 'headphones', desc: '30+ models' },
-  { icon: '📺', name: 'Smart TVs', slug: 'smart-tvs', desc: '25+ models' },
-  { icon: '📷', name: 'Cameras', slug: 'cameras', desc: '20+ models' },
+  { icon: '📱', name: 'Smartphones', slug: 'smartphones', desc: '10 models' },
+  { icon: '💻', name: 'Laptops', slug: 'laptops', desc: '10 models' },
+  { icon: '🎧', name: 'Headphones', slug: 'headphones', desc: '10 models' },
+  { icon: '📺', name: 'Smart TVs', slug: 'smart-tvs', desc: '10 models' },
+  { icon: '📷', name: 'Cameras', slug: 'cameras', desc: '10 models' },
+  { icon: '🎮', name: 'Gaming', slug: 'gaming', desc: '10 models' },
+  { icon: '📲', name: 'Tablets', slug: 'tablets', desc: '10 models' },
+  { icon: '⌚', name: 'Wearables', slug: 'wearables', desc: '10 models' },
+  { icon: '🏠', name: 'Home Appliances', slug: 'home-appliances', desc: '10 models' },
+  { icon: '🔌', name: 'Accessories', slug: 'accessories', desc: '10 models' },
 ]
 
 export default function Home() {
@@ -51,9 +56,9 @@ export default function Home() {
   const [currentFilters, setCurrentFilters] = useState({})
 
   // Load products on mount
-  useState(() => {
+  useEffect(() => {
     load({})
-  })
+  }, [load])
 
   const handleSearch = (searchParams) => {
     const merged = { ...activeCategory ? { category: activeCategory } : {}, ...searchParams }
@@ -92,8 +97,8 @@ export default function Home() {
               <span className="hero-title-highlight">Tech Companion</span>
             </h1>
             <p className="hero-subtitle">
-              Smartphones, laptops, headphones and more — at prices you'll love.
-              Shop 50+ premium products with instant BDT & USD pricing.
+              Smartphones, laptops, gaming gear, wearables and more — at prices you'll love.
+              Shop 100+ premium products across 10 categories with instant BDT &amp; USD pricing.
             </p>
           </div>
           <div className="hero-search-wrap">
@@ -154,8 +159,8 @@ export default function Home() {
       <section className="stats-section">
         <div className="container stats-grid">
           {[
-            { icon: '📦', value: '50+', label: 'Products Listed' },
-            { icon: '🏪', value: '5', label: 'Categories' },
+            { icon: '📦', value: '100+', label: 'Products Listed' },
+            { icon: '🏪', value: '10', label: 'Categories' },
             { icon: '⭐', value: '4.6', label: 'Avg. Rating' },
             { icon: '🇧🇩', value: 'BDT & USD', label: 'Dual Currency' },
           ].map((stat) => (

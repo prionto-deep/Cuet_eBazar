@@ -149,3 +149,35 @@
   color: var(--text-primary);
 }
 
+/* Admin nav button */
+.admin-nav-btn {
+  background: linear-gradient(135deg, #7c3aed22, #7c3aed11);
+  border: 1px solid #7c3aed66;
+  color: #a78bfa;
+  font-weight: 700;
+  font-size: 0.78rem;
+  transition: all var(--transition-base);
+}
+
+.admin-nav-btn:hover {
+  background: linear-gradient(135deg, #7c3aed44, #7c3aed22);
+  border-color: #a78bfa;
+  color: #c4b5fd;
+  box-shadow: 0 0 16px #7c3aed44;
+  transform: translateY(-1px);
+}
+
+/* Admin pill */
+.admin-pill {
+  border-color: #7c3aed55;
+  background: linear-gradient(135deg, #7c3aed11, #7c3aed08);
+}
+
+.admin-pill .seller-avatar {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
+
+.admin-crown {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}

@@ -67,12 +67,19 @@ export default function Navbar() {
           {/* Seller section */}
           {seller ? (
             <>
-              <Link to="/upload" className="btn btn-primary btn-sm">
-                + List Product
-              </Link>
-              <div className="seller-pill">
+              {seller.is_admin ? (
+                <Link to="/admin" className="btn btn-sm admin-nav-btn" id="nav-admin-dashboard">
+                  🛡️ Admin Panel
+                </Link>
+              ) : (
+                <Link to="/upload" className="btn btn-primary btn-sm">
+                  + List Product
+                </Link>
+              )}
+              <div className={`seller-pill ${seller.is_admin ? 'admin-pill' : ''}`}>
                 <span className="seller-avatar">{seller.name?.charAt(0).toUpperCase()}</span>
                 <span className="seller-name">{seller.shop_name || seller.name}</span>
+                {seller.is_admin && <span className="admin-crown">👑</span>}
               </div>
               <button onClick={handleSellerLogout} className="btn btn-secondary btn-sm" id="seller-logout-btn">
                 Logout

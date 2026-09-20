@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import ProductDetail from './pages/ProductDetail'
 import UploadProduct from './pages/UploadProduct'
+import AdminDashboard from './pages/AdminDashboard'
 import SellerLogin from './pages/SellerLogin'
 import SellerRegister from './pages/SellerRegister'
 import BuyerLogin from './pages/BuyerLogin'
@@ -79,6 +80,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <UploadProduct />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <AdminDashboard />
                     </ProtectedRoute>
                   }
                 />

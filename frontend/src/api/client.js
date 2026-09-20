@@ -76,4 +76,16 @@ export const fetchBuyerMe = () =>
 export const placeOrder = (items) =>
   api.post('/orders', { items }).then((r) => r.data)
 
+// ── Admin ─────────────────────────────────────────────────────────────────────
+export const adminFetchProducts = (params = {}) =>
+  api.get('/admin/products', { params }).then((r) => r.data)
+
+export const adminDeleteProduct = (id) =>
+  api.delete(`/admin/products/${id}`)
+
+export const adminUpdateProductImage = (id, formData) =>
+  api.patch(`/admin/products/${id}/image`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then((r) => r.data)
+
 export default api

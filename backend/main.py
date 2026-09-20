@@ -194,6 +194,83 @@ def delete_product(
         raise HTTPException(status_code=404, detail="Product not found or not owned by you")
 
 
+# ── Admin routes ──────────────────────────────────────────────────────────────
+
+def _require_admin(current_seller: models.Seller = Depends(auth.get_current_seller)):
+    if not current_seller.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_seller
+
+
+@app.get("/admin/products", response_model=schemas.ProductsResponse)
+def admin_list_products(
+    search: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=200),
+    current_seller: models.Seller = Depends(_require_admin),
+    db: Session = Depends(get_db),
+):
+    """Admin: list ALL products (including other sellers')."""
+    return crud.get_products(
+        db,
+        search=search,
+        category_slug=category,
+        page=page,
+        limit=limit,
+    )
+
+
+@app.delete("/admin/products/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+def admin_delete_product(
+    product_id: int,
+    current_seller: models.Seller = Depends(_require_admin),
+    db: Session = Depends(get_db),
+):
+    """Admin: permanently hard-delete any product and its uploaded image file."""
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Delete the local image file if it was uploaded (not an external URL)
+    if product.image_url and product.image_url.startswith("/uploads/"):
+        file_path = Path("uploads") / product.image_url.split("/uploads/")[-1]
+        if file_path.exists():
+            file_path.unlink()
+
+    db.delete(product)
+    db.commit()
+
+
+@app.patch("/admin/products/{product_id}/image", response_model=schemas.ProductOut)
+async def admin_update_product_image(
+    product_id: int,
+    image: Optional[UploadFile] = File(None),
+    image_url: Optional[str] = Form(None),
+    current_seller: models.Seller = Depends(_require_admin),
+    db: Session = Depends(get_db),
+):
+    """Admin: replace product image (upload file or set URL)."""
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if image and image.filename:
+        new_url = _save_image(image)
+        # Remove old local file if applicable
+        if product.image_url and product.image_url.startswith("/uploads/"):
+            old_path = Path("uploads") / product.image_url.split("/uploads/")[-1]
+            if old_path.exists():
+                old_path.unlink()
+        product.image_url = new_url
+    elif image_url is not None:
+        product.image_url = image_url
+
+    db.commit()
+    db.refresh(product)
+    return crud.get_product(db, product_id)
+
+
 # ── Order routes ──────────────────────────────────────────────────────────────
 
 @app.post("/orders", response_model=schemas.OrderOut, status_code=status.HTTP_201_CREATED)
