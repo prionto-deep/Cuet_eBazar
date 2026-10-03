@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { placeOrder, formatBDT } from '../api/client'
 import './Cart.css'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../api/config'
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQty, clearCart, totalItems, totalPrice } = useCart()

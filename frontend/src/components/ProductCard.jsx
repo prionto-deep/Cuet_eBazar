@@ -3,7 +3,7 @@ import { formatBDT, formatUSD } from '../api/client'
 import { useCart } from '../context/CartContext'
 import './ProductCard.css'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../api/config'
 
 function StarRating({ rating }) {
   return (

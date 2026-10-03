@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import './ProductDetail.css'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../api/config'
 
 function StarRating({ rating, count }) {
   return (

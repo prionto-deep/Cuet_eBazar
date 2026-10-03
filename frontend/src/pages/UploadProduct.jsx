@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { createProduct, fetchCategories } from '../api/client'
 import './UploadProduct.css'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../api/config'
 
 export default function UploadProduct() {
   const navigate = useNavigate()

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './SearchBar.css'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../api/config'
 const MAX_PRICE_BDT = 500000
 
 export default function SearchBar({ onSearch, initialValues = {} }) {
