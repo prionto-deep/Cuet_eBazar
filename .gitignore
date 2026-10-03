@@ -12,6 +12,11 @@ __pycache__/
 .env.local
 .env.*.local
 
+# Local databases (never commit live data)
+*.db
+*.sqlite
+*.sqlite3
+
 # Node
 node_modules/
 frontend/dist/

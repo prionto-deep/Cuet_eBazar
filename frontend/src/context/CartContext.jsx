@@ -10,7 +10,8 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
     try {
       const stored = localStorage.getItem(CART_KEY)
-      return stored ? JSON.parse(stored) : []
+      const parsed = stored ? JSON.parse(stored) : []
+      return Array.isArray(parsed) ? parsed : []
     } catch {
       return []
     }

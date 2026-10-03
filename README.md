@@ -421,13 +421,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### Environment Variables
 
-The following constants are defined in [`auth.py`](backend/auth.py). **Change these before deploying to production:**
+Backend configuration is read from environment variables (or `backend/.env` locally — copy [`backend/.env.example`](backend/.env.example); `setup.sh` does this for you). Never commit real values.
 
-| Variable | Default | Description |
+| Variable | Required | Description |
 |---|---|---|
-| `SECRET_KEY` | `"daraz-clone-super-secret-key..."` | JWT signing secret — **must be changed in production** |
-| `ALGORITHM` | `"HS256"` | JWT signing algorithm |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `1440` (24h) | Token expiration time |
+| `JWT_SECRET_KEY` | ✅ | JWT signing secret, ≥ 32 random characters. The backend refuses to start without it. |
+| `ADMIN_EMAIL` | — | Email of the admin seller account managed on startup |
+| `ADMIN_PASSWORD` | — | Admin password (≥ 12 chars). Needed to create the admin; if changed, the stored password is rotated on next start |
+| `ADMIN_SHOP_NAME` | — | Admin shop name (default `Prionyx Shop`) |
+| `CORS_ORIGINS` | — | Comma-separated extra allowed origins, e.g. your Netlify URL |
+
+Frontend: set `VITE_API_BASE_URL` (HTTPS backend URL) in Netlify's environment variables. See [`frontend/.env.example`](frontend/.env.example).
+
+JWT algorithm (`HS256`) and token lifetime (`1440` min / 24h) are constants in [`auth.py`](backend/auth.py).
 
 ---
 

@@ -24,7 +24,7 @@ export default function Cart() {
     setOrdering(true)
     setOrderError(null)
     try {
-      const items = cartItems.map((i) => ({ product_id: i.id, quantity: i.qty }))
+      const items = (cartItems || []).map((i) => ({ product_id: i.id, quantity: i.qty }))
       const result = await placeOrder(items)
       setOrderResult(result)
       clearCart()
@@ -69,7 +69,7 @@ export default function Cart() {
     )
   }
 
-  if (cartItems.length === 0) {
+  if (!cartItems || cartItems.length === 0) {
     return (
       <div className="cart-page">
         <div className="cart-container">
@@ -92,7 +92,7 @@ export default function Cart() {
         <div className="cart-layout">
           {/* Items */}
           <div className="cart-items">
-            {cartItems.map((item) => {
+            {(cartItems || []).map((item) => {
               const imageUrl = item.image_url?.startsWith('http')
                 ? item.image_url
                 : `${API_BASE}${item.image_url}`

@@ -32,6 +32,14 @@ echo -e "  ${GREEN}✓ Installed Python dependencies${NC}"
 mkdir -p uploads
 echo -e "  ${GREEN}✓ Created uploads/ directory${NC}"
 
+# Create .env with a random JWT secret if missing
+if [ ! -f ".env" ]; then
+    cp .env.example .env
+    SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(48))')"
+    sed -i.bak "s|^JWT_SECRET_KEY=.*|JWT_SECRET_KEY=${SECRET}|" .env && rm -f .env.bak
+    echo -e "  ${GREEN}✓ Created backend/.env (set ADMIN_EMAIL / ADMIN_PASSWORD in it)${NC}"
+fi
+
 deactivate
 
 # ── Frontend ─────────────────────────────────────────────────────────────────

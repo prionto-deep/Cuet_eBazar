@@ -25,7 +25,7 @@ export default function ProductGrid({ products, loading, total, page, pages, onP
     )
   }
 
-  if (!loading && products.length === 0) {
+  if (!loading && (!products || products.length === 0)) {
     return (
       <div className="empty-state">
         <div className="empty-icon">🔍</div>
@@ -47,7 +47,7 @@ export default function ProductGrid({ products, loading, total, page, pages, onP
       )}
 
       <div className="product-grid">
-        {products.map((p) => (
+        {(products || []).map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}
       </div>

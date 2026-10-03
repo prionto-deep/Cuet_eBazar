@@ -274,34 +274,69 @@ PRODUCTS = {
 }
 
 
+MIN_ADMIN_PASSWORD_LENGTH = 12
+
+
+def _ensure_admin(db):
+    """
+    Create or update the admin seller from environment variables:
+      ADMIN_EMAIL     – required to manage an admin account
+      ADMIN_PASSWORD  – required to create it; if set and different from the
+                        stored hash, the stored password is rotated to it
+      ADMIN_SHOP_NAME – optional display/shop name
+    The password is never printed.
+    """
+    from auth import get_password_hash, verify_password
+
+    admin_email = os.getenv("ADMIN_EMAIL", "").strip()
+    admin_password = os.getenv("ADMIN_PASSWORD", "")
+    shop_name = os.getenv("ADMIN_SHOP_NAME", "Prionyx Shop")
+
+    if not admin_email:
+        print("ℹ️  ADMIN_EMAIL not set; skipping admin account setup.")
+        return
+    if admin_password and len(admin_password) < MIN_ADMIN_PASSWORD_LENGTH:
+        print(f"⚠️  ADMIN_PASSWORD is shorter than {MIN_ADMIN_PASSWORD_LENGTH} characters; ignoring it.")
+        admin_password = ""
+
+    existing_admin = db.query(models.Seller).filter(models.Seller.email == admin_email).first()
+    if not existing_admin:
+        if not admin_password:
+            print("⚠️  ADMIN_PASSWORD not set; admin account was not created.")
+            return
+        db.add(models.Seller(
+            name=shop_name,
+            email=admin_email,
+            hashed_password=get_password_hash(admin_password),
+            shop_name=shop_name,
+            is_admin=True,
+            is_active=True,
+        ))
+        db.commit()
+        print(f"✅ Admin account created: {admin_email}")
+        return
+
+    changed = False
+    if not existing_admin.is_admin:
+        existing_admin.is_admin = True
+        existing_admin.shop_name = shop_name
+        changed = True
+        print(f"✅ Admin flag granted to: {admin_email}")
+    if admin_password and not verify_password(admin_password, existing_admin.hashed_password):
+        existing_admin.hashed_password = get_password_hash(admin_password)
+        changed = True
+        print(f"🔑 Admin password updated from ADMIN_PASSWORD for: {admin_email}")
+    if changed:
+        db.commit()
+    else:
+        print(f"ℹ️  Admin account already exists: {admin_email}")
+
+
 def seed():
     db = SessionLocal()
     try:
-        # ── Create admin account (idempotent) ────────────────────────────────
-        admin_email = "chaningdeep@gmail.com"
-        existing_admin = db.query(models.Seller).filter(models.Seller.email == admin_email).first()
-        if not existing_admin:
-            from auth import get_password_hash
-            admin = models.Seller(
-                name="Prionyx Shop",
-                email=admin_email,
-                hashed_password=get_password_hash("Prionyx@2024"),
-                shop_name="Prionyx Shop",
-                is_admin=True,
-                is_active=True,
-            )
-            db.add(admin)
-            db.commit()
-            print(f"✅ Admin account created: {admin_email} / Prionyx@2024")
-        else:
-            # Ensure existing account is marked as admin
-            if not existing_admin.is_admin:
-                existing_admin.is_admin = True
-                existing_admin.shop_name = "Prionyx Shop"
-                db.commit()
-                print(f"✅ Admin flag granted to: {admin_email}")
-            else:
-                print(f"ℹ️  Admin account already exists: {admin_email}")
+        # ── Create / sync admin account (idempotent) ─────────────────────────
+        _ensure_admin(db)
 
         # ── Skip product seeding if already done ─────────────────────────────
         if db.query(models.Category).count() > 0:

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
 
@@ -122,13 +122,17 @@ class BuyerToken(BaseModel):
 
 # ── Order ─────────────────────────────────────────────────────────────────────
 
+MAX_ORDER_QUANTITY = 1000
+MAX_ORDER_LINES = 50
+
+
 class OrderItem(BaseModel):
     product_id: int
-    quantity: int
+    quantity: int = Field(gt=0, le=MAX_ORDER_QUANTITY)
 
 
 class OrderCreate(BaseModel):
-    items: List[OrderItem]
+    items: List[OrderItem] = Field(min_length=1, max_length=MAX_ORDER_LINES)
 
 
 class OrderItemOut(BaseModel):

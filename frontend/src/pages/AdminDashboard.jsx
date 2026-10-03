@@ -171,10 +171,10 @@ export default function AdminDashboard() {
       if (q) params.search = q
       if (cat) params.category = cat
       const data = await adminFetchProducts(params)
-      setProducts(data.items)
-      setTotal(data.total)
-      setPage(data.page)
-      setPages(data.pages)
+      setProducts(data?.items || [])
+      setTotal(data?.total || 0)
+      setPage(data?.page || 1)
+      setPages(data?.pages || 1)
     } catch (err) {
       console.error(err)
     } finally {

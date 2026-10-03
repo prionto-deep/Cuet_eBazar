@@ -1,5 +1,8 @@
+import os
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
 from jose import JWTError, jwt
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -8,7 +11,15 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 
-SECRET_KEY = "daraz-clone-super-secret-key-change-in-production-2024"
+# Load backend/.env for local development (real env vars take precedence).
+load_dotenv(Path(__file__).with_name(".env"))
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+if len(SECRET_KEY) < 32:
+    raise RuntimeError(
+        "JWT_SECRET_KEY must be set to a random string of at least 32 characters. "
+        "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(48))\""
+    )
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 

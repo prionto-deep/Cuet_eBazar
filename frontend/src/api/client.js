@@ -28,6 +28,24 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Flatten FastAPI validation errors (422 → detail: [{loc, msg}, ...]) into a
+// string so UI code can safely render `err.response.data.detail`.
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    const detail = error.response?.data?.detail
+    if (Array.isArray(detail)) {
+      error.response.data.detail = detail
+        .map((d) => {
+          const field = Array.isArray(d?.loc) ? d.loc[d.loc.length - 1] : ''
+          return d?.msg ? (field ? `${field}: ${d.msg}` : d.msg) : String(d)
+        })
+        .join('; ')
+    }
+    return Promise.reject(error)
+  }
+)
+
 // ── Categories ──────────────────────────────────────────────────────────────
 export const fetchCategories = () =>
   api.get('/categories').then((r) => r.data)

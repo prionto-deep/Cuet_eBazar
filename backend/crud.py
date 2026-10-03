@@ -119,7 +119,7 @@ def update_product(
     if not product:
         return None
 
-    update_data = data.model_dump(exclude_unset=True)
+    update_data = data.model_dump(exclude_unset=True, exclude_none=True)
     for field, value in update_data.items():
         setattr(product, field, value)
     if image_url is not None:
@@ -194,7 +194,12 @@ def place_order(db: Session, buyer_id: int, order_data: schemas.OrderCreate):
     order_items_out = []
     total = 0.0
 
+    if not order_data.items:
+        raise ValueError("Order must contain at least one item.")
+
     for item in order_data.items:
+        if item.quantity <= 0:
+            raise ValueError("Quantity must be a positive number.")
         product = db.query(models.Product).filter(
             models.Product.id == item.product_id,
             models.Product.is_active == True,

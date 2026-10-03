@@ -10,7 +10,7 @@ export default function CategoryNav({ activeSlug, onChange }) {
 
   useEffect(() => {
     fetchCategories()
-      .then((cats) => setCategories([ALL_CATEGORY, ...cats]))
+      .then((cats) => setCategories([ALL_CATEGORY, ...(Array.isArray(cats) ? cats : [])]))
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [])

@@ -22,10 +22,10 @@ function useProducts() {
         Object.entries(params).filter(([, v]) => v !== undefined && v !== '')
       )
       const data = await fetchProducts({ ...cleaned, page: pg, limit: 20 })
-      setProducts(data.items)
-      setTotal(data.total)
-      setPage(data.page)
-      setPages(data.pages)
+      setProducts(data?.items || [])
+      setTotal(data?.total || 0)
+      setPage(data?.page || 1)
+      setPages(data?.pages || 1)
     } catch (err) {
       console.error(err)
     } finally {

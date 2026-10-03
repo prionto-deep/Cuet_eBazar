@@ -22,6 +22,10 @@ seed()
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+# Product field limits (validated on create/update)
+MAX_PRICE_BDT = 10_000_000
+MAX_STOCK = 100_000
+
 app = FastAPI(title="cuetEbazar API", version="2.0.0")
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
@@ -137,9 +141,9 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
 async def create_product(
     name: str = Form(...),
     description: str = Form(""),
-    price_bdt: float = Form(...),
+    price_bdt: float = Form(..., gt=0, le=MAX_PRICE_BDT),
     brand: str = Form(""),
-    stock: int = Form(0),
+    stock: int = Form(0, ge=0, le=MAX_STOCK),
     category_id: int = Form(...),
     image: Optional[UploadFile] = File(None),
     current_seller: models.Seller = Depends(auth.get_current_seller),
@@ -162,9 +166,9 @@ async def update_product(
     product_id: int,
     name: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
-    price_bdt: Optional[float] = Form(None),
+    price_bdt: Optional[float] = Form(None, gt=0, le=MAX_PRICE_BDT),
     brand: Optional[str] = Form(None),
-    stock: Optional[int] = Form(None),
+    stock: Optional[int] = Form(None, ge=0, le=MAX_STOCK),
     category_id: Optional[int] = Form(None),
     image: Optional[UploadFile] = File(None),
     current_seller: models.Seller = Depends(auth.get_current_seller),
